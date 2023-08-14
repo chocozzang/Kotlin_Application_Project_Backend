@@ -1,13 +1,7 @@
 package com.example.AndroidBack.Controller;
 
-import com.example.AndroidBack.Model.FishBait;
-import com.example.AndroidBack.Model.FishContest;
-import com.example.AndroidBack.Model.FishInfo;
-import com.example.AndroidBack.Model.FishRope;
-import com.example.AndroidBack.Service.FishBaitService;
-import com.example.AndroidBack.Service.FishContestService;
-import com.example.AndroidBack.Service.FishRopeService;
-import com.example.AndroidBack.Service.FishService;
+import com.example.AndroidBack.Model.*;
+import com.example.AndroidBack.Service.*;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,6 +18,7 @@ public class FishController {
     FishBaitService fishBaitService;
     FishContestService fishContestService;
     FishRopeService fishRopeService;
+    FishFishService fishFishService;
 
     @GetMapping("fishlist")
     public List<FishInfo> getFishList() {
@@ -67,5 +62,15 @@ public class FishController {
     @GetMapping("fishcontestdetail")
     public FishContest getContestDetail(@RequestParam("fcid") Long fcid) {
         return fishContestService.getContest(fcid);
+    }
+
+    @GetMapping("fishfishlist")
+    public List<FishFish> getFishFishList() {
+        return fishFishService.getFishList();
+    }
+
+    @GetMapping("fishfishdetail")
+    public FishFish getFishFishDetail(@RequestParam("ffid") Long ffid) {
+        return fishFishService.getFish(ffid);
     }
 }
