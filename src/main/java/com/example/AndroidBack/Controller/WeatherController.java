@@ -241,12 +241,12 @@ public class WeatherController {
                 System.out.println(urlBuilder2.toString());
                 setSubPreTemperature(thisUrl2);
 
-                StringBuilder urlBuilder3 = new StringBuilder("http://apis.data.go.kr/1360000/MidFcstInfoService/getMidFcst");
+                StringBuilder urlBuilder3 = new StringBuilder("http://apis.data.go.kr/1360000/MidFcstInfoService/getMidTa");
                 urlBuilder3.append("?" + URLEncoder.encode("ServiceKey", "UTF-8") + "=" + serviceKey3);
                 urlBuilder3.append("&" + URLEncoder.encode("numOfRows", "UTF-8") + "=" + 10);
                 urlBuilder3.append("&" + URLEncoder.encode("pageNo", "UTF-8") + "=" + 1);
                 urlBuilder3.append("&" + URLEncoder.encode("dataType", "UTF-8") + "=" + "json");
-                urlBuilder3.append("&" + URLEncoder.encode("stnId", "UTF-8") + "=" + regionList.get(i));
+                urlBuilder3.append("&" + URLEncoder.encode("regId", "UTF-8") + "=" + regionList.get(i));
 
                 Calendar cal3 = Calendar.getInstance();
                 String cal3Time = simpleDateFormat2.format(cal3.getTime());
@@ -546,22 +546,22 @@ public class WeatherController {
                     firstDayCond = false;
                 } else if (((JSONObject) jo).get("fcstDate").toString().equals(secondDay)
                         && ((JSONObject) jo).get("category").toString().equals("TMX") && secondDayCond1) {
-                    String temperature = ((JSONObject) jo).get("fcstValue").toString();
+                    String temperature = String.valueOf(Integer.parseInt(String.valueOf(Math.round(Double.valueOf(((JSONObject) jo).get("fcstValue").toString())))));
                     secondDayWeatherDTO.setMaxtemp(temperature);
                     secondDayCond1 = false;
                 } else if (((JSONObject) jo).get("fcstDate").toString().equals(secondDay)
                         && ((JSONObject) jo).get("category").toString().equals("TMN") && secondDayCond2) {
-                    String temperature = ((JSONObject) jo).get("fcstValue").toString();
+                    String temperature = String.valueOf(Integer.parseInt(String.valueOf(Math.round(Double.valueOf(((JSONObject) jo).get("fcstValue").toString())))));
                     secondDayWeatherDTO.setMintemp(temperature);
                     secondDayCond2 = false;
                 } else if (((JSONObject) jo).get("fcstDate").toString().equals(thirdDay)
                         && ((JSONObject) jo).get("category").toString().equals("TMX") && thirdDayCond1) {
-                    String temperature = ((JSONObject) jo).get("fcstValue").toString();
+                    String temperature = String.valueOf(Integer.parseInt(String.valueOf(Math.round(Double.valueOf(((JSONObject) jo).get("fcstValue").toString())))));
                     thirdDayWeatherDTO.setMaxtemp(temperature);
                     thirdDayCond1 = false;
                 } else if (((JSONObject) jo).get("fcstDate").toString().equals(thirdDay)
                         && ((JSONObject) jo).get("category").toString().equals("TMN") && thirdDayCond2) {
-                    String temperature = ((JSONObject) jo).get("fcstValue").toString();
+                    String temperature = String.valueOf(Integer.parseInt(String.valueOf(Math.round(Double.valueOf(((JSONObject) jo).get("fcstValue").toString())))));
                     thirdDayWeatherDTO.setMintemp(temperature);
                     thirdDayCond2 = false;
                 }
@@ -603,19 +603,30 @@ public class WeatherController {
             }
             String result3 = temp3.toString();
 
-            //JSONObject jsonObject3 = (JSONObject) jsonParser3.parse(result3);
-            //JSONObject jsonResponse2 = (JSONObject) jsonObject3.get("response");
-            //JSONObject jsonBody2 = (JSONObject) jsonResponse2.get("body");
-            //JSONObject jsonItems2 = (JSONObject) jsonBody2.get("items");
-            //JSONArray jsonArray2 = (JSONArray) jsonItems2.get("item");
+            JSONObject jsonObject3 = (JSONObject) jsonParser3.parse(result3);
+            JSONObject jsonResponse2 = (JSONObject) jsonObject3.get("response");
+            JSONObject jsonBody2 = (JSONObject) jsonResponse2.get("body");
+            JSONObject jsonItems2 = (JSONObject) jsonBody2.get("items");
+            JSONArray jsonArray2 = (JSONArray) jsonItems2.get("item");
 
-            System.out.println(result3);
+            JSONObject preTemper = (JSONObject) jsonArray2.get(0);
 
+            fourthDayWeatherDTO.setMaxtemp(preTemper.get("taMax3").toString());
+            fourthDayWeatherDTO.setMintemp(preTemper.get("taMin3").toString());
+            fifthDayWeatherDTO.setMaxtemp(preTemper.get("taMax4").toString());
+            fifthDayWeatherDTO.setMintemp(preTemper.get("taMin4").toString());
+            sixthDayWeatherDTO.setMaxtemp(preTemper.get("taMax5").toString());
+            sixthDayWeatherDTO.setMintemp(preTemper.get("taMin5").toString());
+            seventhDayWeatherDTO.setMaxtemp(preTemper.get("taMax6").toString());
+            seventhDayWeatherDTO.setMintemp(preTemper.get("taMin6").toString());
 
             jsonReader3.close();
             conn3.disconnect();
         } catch (IOException e) {
             throw new RuntimeException(e); }
+        catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
 //        } catch (ParseException e) {
 //            throw new RuntimeException(e);
 //        }
