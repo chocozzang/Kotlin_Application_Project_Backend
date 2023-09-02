@@ -1,9 +1,8 @@
 package com.example.AndroidBack.Service;
 
-import com.example.AndroidBack.Model.OtherDayWeatherDTO;
-import com.example.AndroidBack.Model.SecondDayWeather;
+import com.example.AndroidBack.Model.SecondDayWeatherDTO;
 import com.example.AndroidBack.Model.ThirdDayWeather;
-import com.example.AndroidBack.Repository.SecondDayWeatherRepository;
+import com.example.AndroidBack.Model.ThirdDayWeatherDTO;
 import com.example.AndroidBack.Repository.ThirdDayWeatherRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,7 +14,7 @@ public class ThirdDayWeatherServiceImpl implements ThirdDayWeatherService{
     ThirdDayWeatherRepository thirdDayWeatherRepository;
 
     @Override
-    public void setThirdDayWeather(OtherDayWeatherDTO thirdDayWeatherDTO) {
+    public void setThirdDayWeather(ThirdDayWeatherDTO thirdDayWeatherDTO) {
         ThirdDayWeather thirdDayWeather = new ThirdDayWeather();
 
         thirdDayWeather.setMaxtemp(thirdDayWeatherDTO.getMaxtemp());
@@ -42,7 +41,7 @@ public class ThirdDayWeatherServiceImpl implements ThirdDayWeatherService{
     }
 
     @Override
-    public OtherDayWeatherDTO getThirdDayWeather() {
+    public SecondDayWeatherDTO getThirdDayWeather() {
         return null;
     }
 

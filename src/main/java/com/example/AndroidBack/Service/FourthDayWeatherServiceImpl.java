@@ -1,11 +1,9 @@
 package com.example.AndroidBack.Service;
 
-import com.example.AndroidBack.Model.FirstDayWeather;
 import com.example.AndroidBack.Model.FourthDayWeather;
-import com.example.AndroidBack.Model.OtherDayWeatherDTO;
-import com.example.AndroidBack.Model.ThirdDayWeather;
+import com.example.AndroidBack.Model.FourthDayWeatherDTO;
+import com.example.AndroidBack.Model.SecondDayWeatherDTO;
 import com.example.AndroidBack.Repository.FourthDayWeatherRepository;
-import com.example.AndroidBack.Repository.ThirdDayWeatherRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +14,7 @@ public class FourthDayWeatherServiceImpl implements FourthDayWeatherService{
     FourthDayWeatherRepository fourthDayWeatherRepository;
 
     @Override
-    public void setFourthDayWeather(OtherDayWeatherDTO fourthDayWeatherDTO) {
+    public void setFourthDayWeather(FourthDayWeatherDTO fourthDayWeatherDTO) {
         FourthDayWeather fourthDayWeather = new FourthDayWeather();
 
         fourthDayWeather.setMaxtemp(fourthDayWeatherDTO.getMaxtemp());
@@ -43,7 +41,7 @@ public class FourthDayWeatherServiceImpl implements FourthDayWeatherService{
     }
 
     @Override
-    public OtherDayWeatherDTO getFourthDayWeather() {
+    public SecondDayWeatherDTO getFourthDayWeather() {
         return null;
     }
 

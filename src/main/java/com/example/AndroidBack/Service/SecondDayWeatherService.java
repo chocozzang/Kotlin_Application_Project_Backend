@@ -1,12 +1,12 @@
 package com.example.AndroidBack.Service;
 
-import com.example.AndroidBack.Model.OtherDayWeatherDTO;
+import com.example.AndroidBack.Model.SecondDayWeatherDTO;
 
 public interface SecondDayWeatherService {
 
-    public void setSecondDayWeather(OtherDayWeatherDTO secondDayWeatherDTO);
+    public void setSecondDayWeather(SecondDayWeatherDTO secondDayWeatherDTO);
 
-    public OtherDayWeatherDTO getSecondDayWeather();
+    public SecondDayWeatherDTO getSecondDayWeather();
 
     public void clearSecondDayWeather();
 }

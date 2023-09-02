@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 @Setter
 @ToString
 @Component
-public class OtherDayWeatherDTO {
+public class SeventhDayWeatherDTO {
 
     private String maxtemp;
     private String mintemp;

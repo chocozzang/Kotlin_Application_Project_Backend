@@ -1,9 +1,6 @@
 package com.example.AndroidBack.Controller;
 
-import com.example.AndroidBack.Model.FirstDayWeatherDTO;
-import com.example.AndroidBack.Model.OtherDayWeatherDTO;
-import com.example.AndroidBack.Model.ThirdDayWeather;
-import com.example.AndroidBack.Model.TodayTideDTO;
+import com.example.AndroidBack.Model.*;
 import com.example.AndroidBack.Service.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,14 +9,14 @@ import lombok.ToString;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.springframework.context.annotation.Bean;
-import org.springframework.stereotype.Component;
+import org.json.simple.parser.ParseException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.*;
@@ -54,12 +51,16 @@ public class WeatherController {
     SecondDayWeatherService secondDayWeatherService;
     ThirdDayWeatherService thirdDayWeatherService;
     FourthDayWeatherService fourthDayWeatherService;
+    FifthDayWeatherService fifthDayWeatherService;
+    SixthDayWeatherService sixthDayWeatherService;
+    SeventhDayWeatherService seventhDayWeatherService;
     private FirstDayWeatherDTO firstDayWeatherDTO;
-    private OtherDayWeatherDTO secondDayWeatherDTO;
-    private OtherDayWeatherDTO thirdDayWeatherDTO;
-    private OtherDayWeatherDTO fourthDayWeatherDTO;
-    private OtherDayWeatherDTO sixDayWeatherDTO;
-    private OtherDayWeatherDTO seventhDayWeatherDTO;
+    private SecondDayWeatherDTO secondDayWeatherDTO;
+    private ThirdDayWeatherDTO thirdDayWeatherDTO;
+    private FourthDayWeatherDTO fourthDayWeatherDTO;
+    private FifthDayWeatherDTO fifthDayWeatherDTO;
+    private SixthDayWeatherDTO sixthDayWeatherDTO;
+    private SeventhDayWeatherDTO seventhDayWeatherDTO;
 
     private XYGrid mapToGrid(double lat, double lon) {
         double RE = 6371.00877; // 지구 반경(km)
@@ -179,12 +180,18 @@ public class WeatherController {
     @GetMapping("/preWeather")
     public void setPreWeatherToday() {
         FirstDayWeatherDTO firstDayWeatherDTO = new FirstDayWeatherDTO();
-
         try {
             firstDayWeatherService.clearFirstDayWeather();
             secondDayWeatherService.clearSecondDayWeather();
+            thirdDayWeatherService.clearThirdDayWeather();
+            fourthDayWeatherService.clearFourthDayWeather();
+            fifthDayWeatherService.clearFifthDayWeather();
+            sixthDayWeatherService.clearSixthDayWeather();
+            seventhDayWeatherService.clearSeventhDayWeather();
+
             String serviceKey = "/FFdZti8UpV2Ku/EnEYvg==";
             String serviceKey2 = "0DZUAX87M9kJWvxPJWL3raL5m9BYWp2N%2FzlC8zZYrvAg6Lwvv7WqwI4%2Bvb729zpp8rxMBKyp29N7kJEzNwrdhQ%3D%3D";
+            String serviceKey3 = "0DZUAX87M9kJWvxPJWL3raL5m9BYWp2N%2FzlC8zZYrvAg6Lwvv7WqwI4%2Bvb729zpp8rxMBKyp29N7kJEzNwrdhQ%3D%3D";
             Date today = new Date();
             SimpleDateFormat simpleDateFormat  = new SimpleDateFormat("yyyyMMdd");
             SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("HHmm");
@@ -199,53 +206,75 @@ public class WeatherController {
                     new LatLon(35.077, 128.768)
             ));
             List<String> regionList  = new ArrayList<>(Arrays.asList("11H20301", "11G00201", "11H20201", "21F20801", "11D20401", "11F20401", "11F20301", "21F20201", "11H20403", "11F20401", "11F20701", "11C20102", "11H20201"));
-            for(int day = 0; day < 4; day++) {
-                Calendar cal = Calendar.getInstance();
-                cal.add(Calendar.DATE, day);
-                today_time = simpleDateFormat.format(cal.getTime());
-                for(int i = 0; i < obsCodeList.size(); i++) {
+
+            for (int i = 0; i < obsCodeList.size(); i++) {
+                Integer base = Integer.valueOf(today_hour);
+                String basetime = "";
+                //System.out.println(base);
+                Calendar cal2 = Calendar.getInstance();
+                today_time = simpleDateFormat.format(cal2.getTime());
+                if (base >= 215 && base <= 514) basetime = "0200";
+                else if (base >= 515 && base <= 814) basetime = "0500";
+                else if (base >= 815 && base <= 1114) basetime = "0800";
+                else if (base >= 1115 && base <= 1414) basetime = "1100";
+                else if (base >= 1415 && base <= 1714) basetime = "1400";
+                else if (base >= 1715 && base <= 2014) basetime = "1700";
+                else if (base >= 2015 && base <= 2314) basetime = "2000";
+                else if (base >= 2315 && base <= 2400) basetime = "2300";
+                else {
+                    cal2.add(Calendar.DATE, -1);
+                    today_time = simpleDateFormat.format(cal2.getTime());
+                    basetime = "2300";
+                }
+                StringBuilder urlBuilder2 = new StringBuilder("http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst");
+                urlBuilder2.append("?" + URLEncoder.encode("ServiceKey", "UTF-8") + "=" + serviceKey2);
+                urlBuilder2.append("&" + URLEncoder.encode("dataType", "UTF-8") + "=" + "json");
+                urlBuilder2.append("&" + URLEncoder.encode("base_date", "UTF-8") + "=" + today_time);
+                LatLon templl = latlonList.get(i);
+                XYGrid tempxy = mapToGrid(templl.lat, templl.lon);
+                urlBuilder2.append("&" + URLEncoder.encode("nx", "UTF-8") + "=" + Integer.parseInt(String.valueOf(Math.round(tempxy.x))));
+                urlBuilder2.append("&" + URLEncoder.encode("ny", "UTF-8") + "=" + Integer.parseInt(String.valueOf(Math.round(tempxy.y))));
+                urlBuilder2.append("&" + URLEncoder.encode("pageNo", "UTF-8") + "=" + "1");
+                urlBuilder2.append("&" + URLEncoder.encode("numOfRows", "UTF-8") + "=" + "1000");
+                urlBuilder2.append("&" + URLEncoder.encode("base_time", "UTF-8") + "=" + basetime);
+                URL thisUrl2 = new URL(urlBuilder2.toString());
+                System.out.println(urlBuilder2.toString());
+                setSubPreTemperature(thisUrl2);
+
+                StringBuilder urlBuilder3 = new StringBuilder("http://apis.data.go.kr/1360000/MidFcstInfoService/getMidFcst");
+                urlBuilder3.append("?" + URLEncoder.encode("ServiceKey", "UTF-8") + "=" + serviceKey3);
+                urlBuilder3.append("&" + URLEncoder.encode("numOfRows", "UTF-8") + "=" + 10);
+                urlBuilder3.append("&" + URLEncoder.encode("pageNo", "UTF-8") + "=" + 1);
+                urlBuilder3.append("&" + URLEncoder.encode("dataType", "UTF-8") + "=" + "json");
+                urlBuilder3.append("&" + URLEncoder.encode("stnId", "UTF-8") + "=" + regionList.get(i));
+
+                Calendar cal3 = Calendar.getInstance();
+                String cal3Time = simpleDateFormat2.format(cal3.getTime());
+                int cal3TimeInt = Integer.parseInt(cal3Time);
+                String cal3TimeStr = null;
+                if(cal3TimeInt >= 605 && cal3TimeInt <= 1804) cal3TimeStr = simpleDateFormat.format(cal3.getTime()) + "0600";
+                else if(cal3TimeInt >= 1805 && cal3TimeInt <= 2359) cal3TimeStr = simpleDateFormat.format(cal3.getTime()) + "1800";
+                else {
+                    cal3.add(Calendar.DATE, -1);
+                    cal3TimeStr = simpleDateFormat.format(cal3.getTime()) + "1800";
+                }
+                urlBuilder3.append("&" + URLEncoder.encode("tmFc") + "=" + cal3TimeStr);
+                URL thisurl3 = new URL(urlBuilder3.toString());
+                setSubPreTemperature2(thisurl3);
+
+                for(int day = 0; day < 7; day++) {
+                    Calendar cal = Calendar.getInstance();
+                    cal.add(Calendar.DATE, day);
+                    today_time = simpleDateFormat.format(cal.getTime());
+                    System.out.println(today_time);
                     StringBuilder urlBuilder = new StringBuilder("http://www.khoa.go.kr/api/oceangrid/tideObsPreTab/search.do");
                     urlBuilder.append("?" + URLEncoder.encode("ServiceKey", "UTF-8") + "=" + serviceKey);
                     urlBuilder.append("&" + URLEncoder.encode("ObsCode", "UTF-8") + "=" + obsCodeList.get(i));
                     urlBuilder.append("&" + URLEncoder.encode("Date", "UTF-8") + "=" + today_time);
                     urlBuilder.append("&" + URLEncoder.encode("ResultType", "UTF-8") + "=" + "json");
                     URL thisUrl = new URL(urlBuilder.toString());
-//                    Integer base = Integer.valueOf(today_hour);
-//                    String basetime = "";
-//                    //System.out.println(base);
-//                    if(base >= 215 && base <= 514) basetime = "0200";
-//                    else if(base >= 515 && base <= 814) basetime = "0500";
-//                    else if(base >= 815 && base <= 1114) basetime = "0800";
-//                    else if(base >= 1115 && base <= 1414) basetime = "1100";
-//                    else if(base >= 1415 && base <= 1714) basetime = "1400";
-//                    else if(base >= 1715 && base <= 2014) basetime = "1700";
-//                    else if(base >= 2015 && base <= 2314) basetime = "2000";
-//                    else if(base >= 2315 && base <= 2400) basetime = "2300";
-//                    else {
-//                        cal = Calendar.getInstance();
-//                        cal.add(Calendar.DATE, -1);
-//                        today_time = simpleDateFormat.format(cal.getTime());
-//                        basetime = "2300";
-//                    }
                     setSubPreWeather(thisUrl, day);
-            }
-
-
-//                StringBuilder urlBuilder2 = new StringBuilder("http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst");
-//                urlBuilder2.append("?" + URLEncoder.encode("ServiceKey", "UTF-8") + "=" + serviceKey2);
-//                urlBuilder2.append("&" + URLEncoder.encode("dataType", "UTF-8") + "=" + "json");
-//                urlBuilder2.append("&" + URLEncoder.encode("base_date", "UTF-8") + "=" + today_time);
-//                LatLon templl = latlonList.get(i);
-//                XYGrid tempxy = mapToGrid(templl.lat, templl.lon);
-//                urlBuilder2.append("&" + URLEncoder.encode("nx", "UTF-8") + "=" + Integer.parseInt(String.valueOf(Math.round(tempxy.x))));
-//                urlBuilder2.append("&" + URLEncoder.encode("ny", "UTF-8") + "=" + Integer.parseInt(String.valueOf(Math.round(tempxy.y))));
-//                urlBuilder2.append("&" + URLEncoder.encode("pageNo", "UTF-8") + "=" + "1");
-//                urlBuilder2.append("&" + URLEncoder.encode("numOfRows", "UTF-8") + "=" + "1000");
-//                urlBuilder2.append("&" + URLEncoder.encode("base_time", "UTF-8") + "=" + basetime);
-//                URL thisUrl2 = new URL(urlBuilder2.toString());
-//                cal = Calendar.getInstance();
-//                cal.add(Calendar.DATE, 1);
-
+                }
             }
 
         } catch (MalformedURLException | UnsupportedEncodingException e) {
@@ -256,8 +285,10 @@ public class WeatherController {
 
     public void setSubPreWeather(URL url, int day) {
         try {
+            System.out.println("HERE TIDE1");
+            HttpURLConnection conn = null;
             // 조석 //
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
             conn.setRequestProperty("Content-type", "application/json");
 
@@ -276,9 +307,6 @@ public class WeatherController {
             }
             String result = temp.toString();
 
-            jsonReader.close();
-            conn.disconnect();
-
             JSONParser jsonParser = new JSONParser();
             JSONObject jsonObject = (JSONObject) jsonParser.parse(result);
             JSONObject resultCol  = (JSONObject) jsonObject.get("result");
@@ -286,45 +314,6 @@ public class WeatherController {
             JSONObject metadata = (JSONObject) resultCol.get("meta");
             String obsCode = ((JSONObject) metadata).get("obs_post_id").toString();
 
-//            // 기온 //
-//            System.out.println("HERE TEMPER");
-//            HttpURLConnection conn2 = (HttpURLConnection) url2.openConnection();
-//            conn2.setRequestMethod("GET");
-//            conn2.setRequestProperty("Content-type", "application/json");
-//
-//            BufferedReader jsonReader2;
-//
-//            if(conn2.getResponseCode() >= 200 && conn2.getResponseCode() <= 300) {
-//                jsonReader2 = new BufferedReader(new InputStreamReader(conn2.getInputStream()));
-//            } else {
-//                jsonReader2 = new BufferedReader(new InputStreamReader(conn2.getErrorStream()));
-//            }
-//
-//            StringBuilder temp2 = new StringBuilder();
-//            String line2;
-//            while((line2 = jsonReader2.readLine()) != null) {
-//                temp2.append(line2);
-//            }
-//            String result2 = temp2.toString();
-//            jsonReader2.close();
-//            conn2.disconnect();
-//
-//            JSONObject jsonObject2 = (JSONObject) jsonParser.parse(result2);
-//            JSONObject jsonResponse= (JSONObject) jsonObject2.get("response");
-//            JSONObject jsonBody    = (JSONObject) jsonResponse.get("body");
-//            JSONObject jsonItems   = (JSONObject) jsonBody.get("items");
-//            JSONArray  jsonArray   = (JSONArray)  jsonItems.get("item");
-//
-//            String temperature = null;
-//            for(Object jo : jsonArray) {
-//                if(((JSONObject) jo).get("category").toString().equals("TMP")) {
-//                    System.out.println((JSONObject) jo);
-//                    temperature = ((JSONObject) jo).get("fcstValue").toString();
-//                    break;
-//                }
-//            }
-//
-//            firstDayWeatherDTO.setNowtemp(temperature);
             if(day == 0) {
                 firstDayWeatherDTO.setObscode(obsCode);
                 for(int i = 0; i < dataCol.size(); i++) {
@@ -421,11 +410,214 @@ public class WeatherController {
                 }
                 System.out.println(fourthDayWeatherDTO);
                 fourthDayWeatherService.setFourthDayWeather(fourthDayWeatherDTO);
-            }
+            } else if(day == 4) {
+                fifthDayWeatherDTO.setObscode(obsCode);
+                for(int i = 0; i < dataCol.size(); i++) {
+                    if(i == 0) {
+                        fifthDayWeatherDTO.setTidelevelOne(((JSONObject) dataCol.get(i)).get("tph_level").toString());
+                        fifthDayWeatherDTO.setTidetimeOne(((JSONObject) dataCol.get(i)).get("tph_time").toString());
+                        fifthDayWeatherDTO.setTidetypeOne(((JSONObject) dataCol.get(i)).get("hl_code").toString());
+                    } else if(i == 1) {
+                        fifthDayWeatherDTO.setTidelevelTwo(((JSONObject) dataCol.get(i)).get("tph_level").toString());
+                        fifthDayWeatherDTO.setTidetimeTwo(((JSONObject) dataCol.get(i)).get("tph_time").toString());
+                        fifthDayWeatherDTO.setTidetypeTwo(((JSONObject) dataCol.get(i)).get("hl_code").toString());
+                    } else if(i == 2) {
+                        fourthDayWeatherDTO.setTidelevelThree(((JSONObject) dataCol.get(i)).get("tph_level").toString());
+                        fifthDayWeatherDTO.setTidetimeThree(((JSONObject) dataCol.get(i)).get("tph_time").toString());
+                        fifthDayWeatherDTO.setTidetypeThree(((JSONObject) dataCol.get(i)).get("hl_code").toString());
+                    } else if(i == 3) {
+                        fifthDayWeatherDTO.setTidelevelFour(((JSONObject) dataCol.get(i)).get("tph_level").toString());
+                        fifthDayWeatherDTO.setTidetimeFour(((JSONObject) dataCol.get(i)).get("tph_time").toString());
+                        fifthDayWeatherDTO.setTidetypeFour(((JSONObject) dataCol.get(i)).get("hl_code").toString());
+                    }
 
+                }
+                System.out.println(fifthDayWeatherDTO);
+                fifthDayWeatherService.setFifthDayWeather(fifthDayWeatherDTO);
+            } else if(day == 5) {
+                sixthDayWeatherDTO.setObscode(obsCode);
+                for(int i = 0; i < dataCol.size(); i++) {
+                    if(i == 0) {
+                        sixthDayWeatherDTO.setTidelevelOne(((JSONObject) dataCol.get(i)).get("tph_level").toString());
+                        sixthDayWeatherDTO.setTidetimeOne(((JSONObject) dataCol.get(i)).get("tph_time").toString());
+                        sixthDayWeatherDTO.setTidetypeOne(((JSONObject) dataCol.get(i)).get("hl_code").toString());
+                    } else if(i == 1) {
+                        sixthDayWeatherDTO.setTidelevelTwo(((JSONObject) dataCol.get(i)).get("tph_level").toString());
+                        sixthDayWeatherDTO.setTidetimeTwo(((JSONObject) dataCol.get(i)).get("tph_time").toString());
+                        sixthDayWeatherDTO.setTidetypeTwo(((JSONObject) dataCol.get(i)).get("hl_code").toString());
+                    } else if(i == 2) {
+                        sixthDayWeatherDTO.setTidelevelThree(((JSONObject) dataCol.get(i)).get("tph_level").toString());
+                        sixthDayWeatherDTO.setTidetimeThree(((JSONObject) dataCol.get(i)).get("tph_time").toString());
+                        sixthDayWeatherDTO.setTidetypeThree(((JSONObject) dataCol.get(i)).get("hl_code").toString());
+                    } else if(i == 3) {
+                        sixthDayWeatherDTO.setTidelevelFour(((JSONObject) dataCol.get(i)).get("tph_level").toString());
+                        sixthDayWeatherDTO.setTidetimeFour(((JSONObject) dataCol.get(i)).get("tph_time").toString());
+                        sixthDayWeatherDTO.setTidetypeFour(((JSONObject) dataCol.get(i)).get("hl_code").toString());
+                    }
+
+                }
+                System.out.println(sixthDayWeatherDTO);
+                sixthDayWeatherService.setSixthDayWeather(sixthDayWeatherDTO);
+            } else if(day == 6) {
+                seventhDayWeatherDTO.setObscode(obsCode);
+                for(int i = 0; i < dataCol.size(); i++) {
+                    if(i == 0) {
+                        seventhDayWeatherDTO.setTidelevelOne(((JSONObject) dataCol.get(i)).get("tph_level").toString());
+                        seventhDayWeatherDTO.setTidetimeOne(((JSONObject) dataCol.get(i)).get("tph_time").toString());
+                        seventhDayWeatherDTO.setTidetypeOne(((JSONObject) dataCol.get(i)).get("hl_code").toString());
+                    } else if(i == 1) {
+                        seventhDayWeatherDTO.setTidelevelTwo(((JSONObject) dataCol.get(i)).get("tph_level").toString());
+                        seventhDayWeatherDTO.setTidetimeTwo(((JSONObject) dataCol.get(i)).get("tph_time").toString());
+                        seventhDayWeatherDTO.setTidetypeTwo(((JSONObject) dataCol.get(i)).get("hl_code").toString());
+                    } else if(i == 2) {
+                        seventhDayWeatherDTO.setTidelevelThree(((JSONObject) dataCol.get(i)).get("tph_level").toString());
+                        seventhDayWeatherDTO.setTidetimeThree(((JSONObject) dataCol.get(i)).get("tph_time").toString());
+                        seventhDayWeatherDTO.setTidetypeThree(((JSONObject) dataCol.get(i)).get("hl_code").toString());
+                    } else if(i == 3) {
+                        seventhDayWeatherDTO.setTidelevelFour(((JSONObject) dataCol.get(i)).get("tph_level").toString());
+                        seventhDayWeatherDTO.setTidetimeFour(((JSONObject) dataCol.get(i)).get("tph_time").toString());
+                        seventhDayWeatherDTO.setTidetypeFour(((JSONObject) dataCol.get(i)).get("hl_code").toString());
+                    }
+
+                }
+                System.out.println(seventhDayWeatherDTO);
+                seventhDayWeatherService.setSeventhDayWeather(seventhDayWeatherDTO);
+            }
+            jsonReader.close();
+            conn.disconnect();
 
         } catch(Exception e) {
             e.getMessage();
         }
+
+    }
+
+    public void setSubPreTemperature(URL url2) {
+        // 기온 //
+
+        try {
+            System.out.println("HERE TEMPER1");
+            HttpURLConnection conn2 = null;
+            conn2 = (HttpURLConnection) url2.openConnection();
+            conn2.setRequestMethod("GET");
+            conn2.setRequestProperty("Content-type", "application/json");
+
+            BufferedReader jsonReader2;
+            JSONParser jsonParser2 = new JSONParser();
+
+            if (conn2.getResponseCode() >= 200 && conn2.getResponseCode() <= 300) {
+                jsonReader2 = new BufferedReader(new InputStreamReader(conn2.getInputStream()));
+            } else {
+                jsonReader2 = new BufferedReader(new InputStreamReader(conn2.getErrorStream()));
+            }
+
+            StringBuilder temp2 = new StringBuilder();
+            String line2;
+            while ((line2 = jsonReader2.readLine()) != null) {
+                temp2.append(line2);
+            }
+            String result2 = temp2.toString();
+
+            JSONObject jsonObject2 = (JSONObject) jsonParser2.parse(result2);
+            JSONObject jsonResponse = (JSONObject) jsonObject2.get("response");
+            JSONObject jsonBody = (JSONObject) jsonResponse.get("body");
+            JSONObject jsonItems = (JSONObject) jsonBody.get("items");
+            JSONArray jsonArray = (JSONArray) jsonItems.get("item");
+
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
+            Calendar cal2 = Calendar.getInstance();
+            String firstDay = simpleDateFormat.format(cal2.getTime());
+            cal2.add(Calendar.DATE, 1);
+            String secondDay = simpleDateFormat.format(cal2.getTime());
+            cal2.add(Calendar.DATE, 1);
+            String thirdDay = simpleDateFormat.format(cal2.getTime());
+
+            boolean firstDayCond = true;
+            boolean secondDayCond1 = true;
+            boolean secondDayCond2 = true;
+            boolean thirdDayCond1 = true;
+            boolean thirdDayCond2 = true;
+
+            for (Object jo : jsonArray) {
+                if (((JSONObject) jo).get("fcstDate").toString().equals(firstDay)
+                        && ((JSONObject) jo).get("category").toString().equals("TMP") && firstDayCond) {
+                    String temperature = ((JSONObject) jo).get("fcstValue").toString();
+                    firstDayWeatherDTO.setNowtemp(temperature);
+                    firstDayCond = false;
+                } else if (((JSONObject) jo).get("fcstDate").toString().equals(secondDay)
+                        && ((JSONObject) jo).get("category").toString().equals("TMX") && secondDayCond1) {
+                    String temperature = ((JSONObject) jo).get("fcstValue").toString();
+                    secondDayWeatherDTO.setMaxtemp(temperature);
+                    secondDayCond1 = false;
+                } else if (((JSONObject) jo).get("fcstDate").toString().equals(secondDay)
+                        && ((JSONObject) jo).get("category").toString().equals("TMN") && secondDayCond2) {
+                    String temperature = ((JSONObject) jo).get("fcstValue").toString();
+                    secondDayWeatherDTO.setMintemp(temperature);
+                    secondDayCond2 = false;
+                } else if (((JSONObject) jo).get("fcstDate").toString().equals(thirdDay)
+                        && ((JSONObject) jo).get("category").toString().equals("TMX") && thirdDayCond1) {
+                    String temperature = ((JSONObject) jo).get("fcstValue").toString();
+                    thirdDayWeatherDTO.setMaxtemp(temperature);
+                    thirdDayCond1 = false;
+                } else if (((JSONObject) jo).get("fcstDate").toString().equals(thirdDay)
+                        && ((JSONObject) jo).get("category").toString().equals("TMN") && thirdDayCond2) {
+                    String temperature = ((JSONObject) jo).get("fcstValue").toString();
+                    thirdDayWeatherDTO.setMintemp(temperature);
+                    thirdDayCond2 = false;
+                }
+                if (!firstDayCond && !secondDayCond1 && !secondDayCond2 && !thirdDayCond1 && !thirdDayCond2) break;
+            }
+            jsonReader2.close();
+            conn2.disconnect();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void setSubPreTemperature2(URL url3) {
+        // 기온 //
+
+        try {
+            System.out.println("HERE TEMPER2");
+            System.out.println(url3.toString());
+            HttpURLConnection conn3 = null;
+            conn3 = (HttpURLConnection) url3.openConnection();
+            conn3.setRequestMethod("GET");
+            conn3.setRequestProperty("Content-type", "application/json");
+
+            BufferedReader jsonReader3;
+            JSONParser jsonParser3 = new JSONParser();
+
+            if (conn3.getResponseCode() >= 200 && conn3.getResponseCode() <= 300) {
+                jsonReader3 = new BufferedReader(new InputStreamReader(conn3.getInputStream()));
+            } else {
+                jsonReader3 = new BufferedReader(new InputStreamReader(conn3.getErrorStream()));
+            }
+
+            StringBuilder temp3 = new StringBuilder();
+            String line3;
+            while ((line3 = jsonReader3.readLine()) != null) {
+                temp3.append(line3);
+            }
+            String result3 = temp3.toString();
+
+            //JSONObject jsonObject3 = (JSONObject) jsonParser3.parse(result3);
+            //JSONObject jsonResponse2 = (JSONObject) jsonObject3.get("response");
+            //JSONObject jsonBody2 = (JSONObject) jsonResponse2.get("body");
+            //JSONObject jsonItems2 = (JSONObject) jsonBody2.get("items");
+            //JSONArray jsonArray2 = (JSONArray) jsonItems2.get("item");
+
+            System.out.println(result3);
+
+
+            jsonReader3.close();
+            conn3.disconnect();
+        } catch (IOException e) {
+            throw new RuntimeException(e); }
+//        } catch (ParseException e) {
+//            throw new RuntimeException(e);
+//        }
     }
 }
