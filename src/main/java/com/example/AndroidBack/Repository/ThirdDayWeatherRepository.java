@@ -15,4 +15,6 @@ public interface ThirdDayWeatherRepository extends JpaRepository<ThirdDayWeather
     @Query(value = "truncate third_day_weather", nativeQuery = true)
     public void clearTable();
 
+    public ThirdDayWeather findByObscode(String obscode);
+
 }

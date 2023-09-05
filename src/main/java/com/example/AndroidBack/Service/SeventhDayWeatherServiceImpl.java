@@ -1,10 +1,12 @@
 package com.example.AndroidBack.Service;
 
+import com.example.AndroidBack.Model.OtherDayWeatherDTO;
 import com.example.AndroidBack.Model.SecondDayWeatherDTO;
 import com.example.AndroidBack.Model.SeventhDayWeather;
 import com.example.AndroidBack.Model.SeventhDayWeatherDTO;
 import com.example.AndroidBack.Repository.SeventhDayWeatherRepository;
 import lombok.AllArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 @AllArgsConstructor
@@ -41,8 +43,10 @@ public class SeventhDayWeatherServiceImpl implements SeventhDayWeatherService{
     }
 
     @Override
-    public SecondDayWeatherDTO getSeventhDayWeather() {
-        return null;
+    public OtherDayWeatherDTO getSeventhDayWeather(String obscode) {
+        SeventhDayWeather seventhDayWeather = seventhDayWeatherRepository.findByObscode(obscode);
+        ModelMapper modelMapper = new ModelMapper();
+        return modelMapper.map(seventhDayWeather, OtherDayWeatherDTO.class);
     }
 
     @Override

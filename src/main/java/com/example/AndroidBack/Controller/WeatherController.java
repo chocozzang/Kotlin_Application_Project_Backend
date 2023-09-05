@@ -100,6 +100,30 @@ public class WeatherController {
         return new XYGrid(x, y);
     }
 
+    @GetMapping("/totalWeathers")
+    public TotalWeatherDTO getTotalWeathers(@RequestParam("obscode") String obscode) {
+        TotalWeatherDTO totalWeatherDTO = new TotalWeatherDTO();
+
+        List<TodayTideDTO> todayTideDTOS_2 = new ArrayList<>();
+        todayTideDTOS_2 = todayTideService.getTodayTide(obscode);
+        totalWeatherDTO.setTodayTideDTOList(todayTideDTOS_2);
+
+        FirstDayWeatherDTO firstDayWeatherDTO_2 = new FirstDayWeatherDTO();
+        firstDayWeatherDTO_2 = firstDayWeatherService.getFirstDayWeather(obscode);
+        totalWeatherDTO.setFirstDayWeatherDTO(firstDayWeatherDTO_2);
+
+        List<OtherDayWeatherDTO> otherDayWeatherDTOS_2 = new ArrayList<>();
+        otherDayWeatherDTOS_2.add(secondDayWeatherService.getSecondDayWeather(obscode));
+        otherDayWeatherDTOS_2.add(thirdDayWeatherService.getThirdDayWeather(obscode));
+        otherDayWeatherDTOS_2.add(fourthDayWeatherService.getFourthDayWeather(obscode));
+        otherDayWeatherDTOS_2.add(fifthDayWeatherService.getFifthDayWeather(obscode));
+        otherDayWeatherDTOS_2.add(sixthDayWeatherService.getSixthDayWeather(obscode));
+        otherDayWeatherDTOS_2.add(seventhDayWeatherService.getSeventhDayWeather(obscode));
+        totalWeatherDTO.setOtherDayWeatherDTOList(otherDayWeatherDTOS_2);
+
+        return totalWeatherDTO;
+    }
+
     @GetMapping("/todayTide")
     public void setTodayTide() {
         try {
@@ -314,171 +338,361 @@ public class WeatherController {
             JSONObject metadata = (JSONObject) resultCol.get("meta");
             String obsCode = ((JSONObject) metadata).get("obs_post_id").toString();
 
+
             if(day == 0) {
+                Boolean checkone = false;
+                Boolean checktwo = false;
+                Boolean checkthree = false;
+                Boolean checkfour = false;
                 firstDayWeatherDTO.setObscode(obsCode);
                 for(int i = 0; i < dataCol.size(); i++) {
-                    if(i == 0) {
+                    if (i == 0) {
                         firstDayWeatherDTO.setTidelevelOne(((JSONObject) dataCol.get(i)).get("tph_level").toString());
                         firstDayWeatherDTO.setTidetimeOne(((JSONObject) dataCol.get(i)).get("tph_time").toString());
                         firstDayWeatherDTO.setTidetypeOne(((JSONObject) dataCol.get(i)).get("hl_code").toString());
-                    } else if(i == 1) {
+                        checkone = true;
+                    } else if (i == 1) {
                         firstDayWeatherDTO.setTidelevelTwo(((JSONObject) dataCol.get(i)).get("tph_level").toString());
                         firstDayWeatherDTO.setTidetimeTwo(((JSONObject) dataCol.get(i)).get("tph_time").toString());
                         firstDayWeatherDTO.setTidetypeTwo(((JSONObject) dataCol.get(i)).get("hl_code").toString());
-                    } else if(i == 2) {
+                        checktwo = true;
+                    } else if (i == 2) {
                         firstDayWeatherDTO.setTidelevelThree(((JSONObject) dataCol.get(i)).get("tph_level").toString());
                         firstDayWeatherDTO.setTidetimeThree(((JSONObject) dataCol.get(i)).get("tph_time").toString());
                         firstDayWeatherDTO.setTidetypeThree(((JSONObject) dataCol.get(i)).get("hl_code").toString());
-                    } else if(i == 3) {
+                        checkthree = true;
+                    } else if (i == 3) {
                         firstDayWeatherDTO.setTidelevelFour(((JSONObject) dataCol.get(i)).get("tph_level").toString());
                         firstDayWeatherDTO.setTidetimeFour(((JSONObject) dataCol.get(i)).get("tph_time").toString());
                         firstDayWeatherDTO.setTidetypeFour(((JSONObject) dataCol.get(i)).get("hl_code").toString());
+                        checkfour = true;
                     }
-
+                }
+                if(!checkone) {
+                    firstDayWeatherDTO.setTidelevelOne(null);
+                    firstDayWeatherDTO.setTidetimeOne(null);
+                    firstDayWeatherDTO.setTidetypeOne(null);
+                }
+                if(!checktwo) {
+                    firstDayWeatherDTO.setTidelevelTwo(null);
+                    firstDayWeatherDTO.setTidetimeTwo(null);
+                    firstDayWeatherDTO.setTidetypeTwo(null);
+                }
+                if(!checkthree) {
+                    firstDayWeatherDTO.setTidelevelThree(null);
+                    firstDayWeatherDTO.setTidetimeThree(null);
+                    firstDayWeatherDTO.setTidetypeThree(null);
+                }
+                if(!checkfour) {
+                    firstDayWeatherDTO.setTidelevelFour(null);
+                    firstDayWeatherDTO.setTidetimeFour(null);
+                    firstDayWeatherDTO.setTidetypeFour(null);
                 }
                 System.out.println(firstDayWeatherDTO);
                 firstDayWeatherService.setFirstDayWeather(firstDayWeatherDTO);
             } else if(day == 1) {
                 secondDayWeatherDTO.setObscode(obsCode);
+                Boolean checkone = false;
+                Boolean checktwo = false;
+                Boolean checkthree = false;
+                Boolean checkfour = false;
                 for(int i = 0; i < dataCol.size(); i++) {
                     if(i == 0) {
                         secondDayWeatherDTO.setTidelevelOne(((JSONObject) dataCol.get(i)).get("tph_level").toString());
                         secondDayWeatherDTO.setTidetimeOne(((JSONObject) dataCol.get(i)).get("tph_time").toString());
                         secondDayWeatherDTO.setTidetypeOne(((JSONObject) dataCol.get(i)).get("hl_code").toString());
+                        checkone = true;
                     } else if(i == 1) {
                         secondDayWeatherDTO.setTidelevelTwo(((JSONObject) dataCol.get(i)).get("tph_level").toString());
                         secondDayWeatherDTO.setTidetimeTwo(((JSONObject) dataCol.get(i)).get("tph_time").toString());
                         secondDayWeatherDTO.setTidetypeTwo(((JSONObject) dataCol.get(i)).get("hl_code").toString());
+                        checktwo = true;
                     } else if(i == 2) {
                         secondDayWeatherDTO.setTidelevelThree(((JSONObject) dataCol.get(i)).get("tph_level").toString());
                         secondDayWeatherDTO.setTidetimeThree(((JSONObject) dataCol.get(i)).get("tph_time").toString());
                         secondDayWeatherDTO.setTidetypeThree(((JSONObject) dataCol.get(i)).get("hl_code").toString());
+                        checkthree = true;
                     } else if(i == 3) {
                         secondDayWeatherDTO.setTidelevelFour(((JSONObject) dataCol.get(i)).get("tph_level").toString());
                         secondDayWeatherDTO.setTidetimeFour(((JSONObject) dataCol.get(i)).get("tph_time").toString());
                         secondDayWeatherDTO.setTidetypeFour(((JSONObject) dataCol.get(i)).get("hl_code").toString());
+                        checkfour = true;
                     }
-
+                }
+                if(!checkone) {
+                    secondDayWeatherDTO.setTidelevelOne(null);
+                    secondDayWeatherDTO.setTidetimeOne(null);
+                    secondDayWeatherDTO.setTidetypeOne(null);
+                }
+                if(!checktwo) {
+                    secondDayWeatherDTO.setTidelevelTwo(null);
+                    secondDayWeatherDTO.setTidetimeTwo(null);
+                    secondDayWeatherDTO.setTidetypeTwo(null);
+                }
+                if(!checkthree) {
+                    secondDayWeatherDTO.setTidelevelThree(null);
+                    secondDayWeatherDTO.setTidetimeThree(null);
+                    secondDayWeatherDTO.setTidetypeThree(null);
+                }
+                if(!checkfour) {
+                    secondDayWeatherDTO.setTidelevelFour(null);
+                    secondDayWeatherDTO.setTidetimeFour(null);
+                    secondDayWeatherDTO.setTidetypeFour(null);
                 }
                 System.out.println(secondDayWeatherDTO);
                 secondDayWeatherService.setSecondDayWeather(secondDayWeatherDTO);
             } else if(day == 2) {
+                Boolean checkone = false;
+                Boolean checktwo = false;
+                Boolean checkthree = false;
+                Boolean checkfour = false;
                 thirdDayWeatherDTO.setObscode(obsCode);
                 for(int i = 0; i < dataCol.size(); i++) {
                     if(i == 0) {
                         thirdDayWeatherDTO.setTidelevelOne(((JSONObject) dataCol.get(i)).get("tph_level").toString());
                         thirdDayWeatherDTO.setTidetimeOne(((JSONObject) dataCol.get(i)).get("tph_time").toString());
                         thirdDayWeatherDTO.setTidetypeOne(((JSONObject) dataCol.get(i)).get("hl_code").toString());
+                        checkone = true;
                     } else if(i == 1) {
                         thirdDayWeatherDTO.setTidelevelTwo(((JSONObject) dataCol.get(i)).get("tph_level").toString());
                         thirdDayWeatherDTO.setTidetimeTwo(((JSONObject) dataCol.get(i)).get("tph_time").toString());
                         thirdDayWeatherDTO.setTidetypeTwo(((JSONObject) dataCol.get(i)).get("hl_code").toString());
+                        checktwo = true;
                     } else if(i == 2) {
                         thirdDayWeatherDTO.setTidelevelThree(((JSONObject) dataCol.get(i)).get("tph_level").toString());
                         thirdDayWeatherDTO.setTidetimeThree(((JSONObject) dataCol.get(i)).get("tph_time").toString());
                         thirdDayWeatherDTO.setTidetypeThree(((JSONObject) dataCol.get(i)).get("hl_code").toString());
+                        checkthree = true;
                     } else if(i == 3) {
                         thirdDayWeatherDTO.setTidelevelFour(((JSONObject) dataCol.get(i)).get("tph_level").toString());
                         thirdDayWeatherDTO.setTidetimeFour(((JSONObject) dataCol.get(i)).get("tph_time").toString());
                         thirdDayWeatherDTO.setTidetypeFour(((JSONObject) dataCol.get(i)).get("hl_code").toString());
+                        checkfour = true;
                     }
-
+                }
+                if(!checkone) {
+                    thirdDayWeatherDTO.setTidelevelOne(null);
+                    thirdDayWeatherDTO.setTidetimeOne(null);
+                    thirdDayWeatherDTO.setTidetypeOne(null);
+                }
+                if(!checktwo) {
+                    thirdDayWeatherDTO.setTidelevelTwo(null);
+                    thirdDayWeatherDTO.setTidetimeTwo(null);
+                    thirdDayWeatherDTO.setTidetypeTwo(null);
+                }
+                if(!checkthree) {
+                    thirdDayWeatherDTO.setTidelevelThree(null);
+                    thirdDayWeatherDTO.setTidetimeThree(null);
+                    thirdDayWeatherDTO.setTidetypeThree(null);
+                }
+                if(!checkfour) {
+                    thirdDayWeatherDTO.setTidelevelFour(null);
+                    thirdDayWeatherDTO.setTidetimeFour(null);
+                    thirdDayWeatherDTO.setTidetypeFour(null);
                 }
                 System.out.println(thirdDayWeatherDTO);
                 thirdDayWeatherService.setThirdDayWeather(thirdDayWeatherDTO);
             } else if(day == 3) {
+                Boolean checkone = false;
+                Boolean checktwo = false;
+                Boolean checkthree = false;
+                Boolean checkfour = false;
                 fourthDayWeatherDTO.setObscode(obsCode);
                 for(int i = 0; i < dataCol.size(); i++) {
                     if(i == 0) {
                         fourthDayWeatherDTO.setTidelevelOne(((JSONObject) dataCol.get(i)).get("tph_level").toString());
                         fourthDayWeatherDTO.setTidetimeOne(((JSONObject) dataCol.get(i)).get("tph_time").toString());
                         fourthDayWeatherDTO.setTidetypeOne(((JSONObject) dataCol.get(i)).get("hl_code").toString());
+                        checkone = true;
                     } else if(i == 1) {
                         fourthDayWeatherDTO.setTidelevelTwo(((JSONObject) dataCol.get(i)).get("tph_level").toString());
                         fourthDayWeatherDTO.setTidetimeTwo(((JSONObject) dataCol.get(i)).get("tph_time").toString());
                         fourthDayWeatherDTO.setTidetypeTwo(((JSONObject) dataCol.get(i)).get("hl_code").toString());
+                        checktwo = true;
                     } else if(i == 2) {
                         fourthDayWeatherDTO.setTidelevelThree(((JSONObject) dataCol.get(i)).get("tph_level").toString());
                         fourthDayWeatherDTO.setTidetimeThree(((JSONObject) dataCol.get(i)).get("tph_time").toString());
                         fourthDayWeatherDTO.setTidetypeThree(((JSONObject) dataCol.get(i)).get("hl_code").toString());
+                        checkthree = true;
                     } else if(i == 3) {
                         fourthDayWeatherDTO.setTidelevelFour(((JSONObject) dataCol.get(i)).get("tph_level").toString());
                         fourthDayWeatherDTO.setTidetimeFour(((JSONObject) dataCol.get(i)).get("tph_time").toString());
                         fourthDayWeatherDTO.setTidetypeFour(((JSONObject) dataCol.get(i)).get("hl_code").toString());
+                        checkfour = true;
                     }
-
+                }
+                if(!checkone) {
+                    fourthDayWeatherDTO.setTidelevelOne(null);
+                    fourthDayWeatherDTO.setTidetimeOne(null);
+                    fourthDayWeatherDTO.setTidetypeOne(null);
+                }
+                if(!checktwo) {
+                    fourthDayWeatherDTO.setTidelevelTwo(null);
+                    fourthDayWeatherDTO.setTidetimeTwo(null);
+                    fourthDayWeatherDTO.setTidetypeTwo(null);
+                }
+                if(!checkthree) {
+                    fourthDayWeatherDTO.setTidelevelThree(null);
+                    fourthDayWeatherDTO.setTidetimeThree(null);
+                    fourthDayWeatherDTO.setTidetypeThree(null);
+                }
+                if(!checkfour) {
+                    fourthDayWeatherDTO.setTidelevelFour(null);
+                    fourthDayWeatherDTO.setTidetimeFour(null);
+                    fourthDayWeatherDTO.setTidetypeFour(null);
                 }
                 System.out.println(fourthDayWeatherDTO);
                 fourthDayWeatherService.setFourthDayWeather(fourthDayWeatherDTO);
             } else if(day == 4) {
                 fifthDayWeatherDTO.setObscode(obsCode);
+                Boolean checkone = false;
+                Boolean checktwo = false;
+                Boolean checkthree = false;
+                Boolean checkfour = false;
                 for(int i = 0; i < dataCol.size(); i++) {
                     if(i == 0) {
                         fifthDayWeatherDTO.setTidelevelOne(((JSONObject) dataCol.get(i)).get("tph_level").toString());
                         fifthDayWeatherDTO.setTidetimeOne(((JSONObject) dataCol.get(i)).get("tph_time").toString());
                         fifthDayWeatherDTO.setTidetypeOne(((JSONObject) dataCol.get(i)).get("hl_code").toString());
+                        checkone = true;
                     } else if(i == 1) {
                         fifthDayWeatherDTO.setTidelevelTwo(((JSONObject) dataCol.get(i)).get("tph_level").toString());
                         fifthDayWeatherDTO.setTidetimeTwo(((JSONObject) dataCol.get(i)).get("tph_time").toString());
                         fifthDayWeatherDTO.setTidetypeTwo(((JSONObject) dataCol.get(i)).get("hl_code").toString());
+                        checktwo = true;
                     } else if(i == 2) {
-                        fourthDayWeatherDTO.setTidelevelThree(((JSONObject) dataCol.get(i)).get("tph_level").toString());
+                        fifthDayWeatherDTO.setTidelevelThree(((JSONObject) dataCol.get(i)).get("tph_level").toString());
                         fifthDayWeatherDTO.setTidetimeThree(((JSONObject) dataCol.get(i)).get("tph_time").toString());
                         fifthDayWeatherDTO.setTidetypeThree(((JSONObject) dataCol.get(i)).get("hl_code").toString());
+                        checkthree = true;
                     } else if(i == 3) {
                         fifthDayWeatherDTO.setTidelevelFour(((JSONObject) dataCol.get(i)).get("tph_level").toString());
                         fifthDayWeatherDTO.setTidetimeFour(((JSONObject) dataCol.get(i)).get("tph_time").toString());
                         fifthDayWeatherDTO.setTidetypeFour(((JSONObject) dataCol.get(i)).get("hl_code").toString());
+                        checkfour = true;
                     }
-
+                }
+                if(!checkone) {
+                    fifthDayWeatherDTO.setTidelevelOne(null);
+                    fifthDayWeatherDTO.setTidetimeOne(null);
+                    fifthDayWeatherDTO.setTidetypeOne(null);
+                }
+                if(!checktwo) {
+                    fifthDayWeatherDTO.setTidelevelTwo(null);
+                    fifthDayWeatherDTO.setTidetimeTwo(null);
+                    fifthDayWeatherDTO.setTidetypeTwo(null);
+                }
+                if(!checkthree) {
+                    fifthDayWeatherDTO.setTidelevelThree(null);
+                    fifthDayWeatherDTO.setTidetimeThree(null);
+                    fifthDayWeatherDTO.setTidetypeThree(null);
+                }
+                if(!checkfour) {
+                    fifthDayWeatherDTO.setTidelevelFour(null);
+                    fifthDayWeatherDTO.setTidetimeFour(null);
+                    fifthDayWeatherDTO.setTidetypeFour(null);
                 }
                 System.out.println(fifthDayWeatherDTO);
                 fifthDayWeatherService.setFifthDayWeather(fifthDayWeatherDTO);
             } else if(day == 5) {
                 sixthDayWeatherDTO.setObscode(obsCode);
+                Boolean checkone = false;
+                Boolean checktwo = false;
+                Boolean checkthree = false;
+                Boolean checkfour = false;
                 for(int i = 0; i < dataCol.size(); i++) {
                     if(i == 0) {
                         sixthDayWeatherDTO.setTidelevelOne(((JSONObject) dataCol.get(i)).get("tph_level").toString());
                         sixthDayWeatherDTO.setTidetimeOne(((JSONObject) dataCol.get(i)).get("tph_time").toString());
                         sixthDayWeatherDTO.setTidetypeOne(((JSONObject) dataCol.get(i)).get("hl_code").toString());
+                        checkone = true;
                     } else if(i == 1) {
                         sixthDayWeatherDTO.setTidelevelTwo(((JSONObject) dataCol.get(i)).get("tph_level").toString());
                         sixthDayWeatherDTO.setTidetimeTwo(((JSONObject) dataCol.get(i)).get("tph_time").toString());
                         sixthDayWeatherDTO.setTidetypeTwo(((JSONObject) dataCol.get(i)).get("hl_code").toString());
+                        checktwo = true;
                     } else if(i == 2) {
                         sixthDayWeatherDTO.setTidelevelThree(((JSONObject) dataCol.get(i)).get("tph_level").toString());
                         sixthDayWeatherDTO.setTidetimeThree(((JSONObject) dataCol.get(i)).get("tph_time").toString());
                         sixthDayWeatherDTO.setTidetypeThree(((JSONObject) dataCol.get(i)).get("hl_code").toString());
+                        checkthree = true;
                     } else if(i == 3) {
                         sixthDayWeatherDTO.setTidelevelFour(((JSONObject) dataCol.get(i)).get("tph_level").toString());
                         sixthDayWeatherDTO.setTidetimeFour(((JSONObject) dataCol.get(i)).get("tph_time").toString());
                         sixthDayWeatherDTO.setTidetypeFour(((JSONObject) dataCol.get(i)).get("hl_code").toString());
+                        checkfour = true;
                     }
-
+                }
+                if(!checkone) {
+                    sixthDayWeatherDTO.setTidelevelOne(null);
+                    sixthDayWeatherDTO.setTidetimeOne(null);
+                    sixthDayWeatherDTO.setTidetypeOne(null);
+                }
+                if(!checktwo) {
+                    sixthDayWeatherDTO.setTidelevelTwo(null);
+                    sixthDayWeatherDTO.setTidetimeTwo(null);
+                    sixthDayWeatherDTO.setTidetypeTwo(null);
+                }
+                if(!checkthree) {
+                    sixthDayWeatherDTO.setTidelevelThree(null);
+                    sixthDayWeatherDTO.setTidetimeThree(null);
+                    sixthDayWeatherDTO.setTidetypeThree(null);
+                }
+                if(!checkfour) {
+                    sixthDayWeatherDTO.setTidelevelFour(null);
+                    sixthDayWeatherDTO.setTidetimeFour(null);
+                    sixthDayWeatherDTO.setTidetypeFour(null);
                 }
                 System.out.println(sixthDayWeatherDTO);
                 sixthDayWeatherService.setSixthDayWeather(sixthDayWeatherDTO);
             } else if(day == 6) {
                 seventhDayWeatherDTO.setObscode(obsCode);
+                Boolean checkone = false;
+                Boolean checktwo = false;
+                Boolean checkthree = false;
+                Boolean checkfour = false;
                 for(int i = 0; i < dataCol.size(); i++) {
                     if(i == 0) {
                         seventhDayWeatherDTO.setTidelevelOne(((JSONObject) dataCol.get(i)).get("tph_level").toString());
                         seventhDayWeatherDTO.setTidetimeOne(((JSONObject) dataCol.get(i)).get("tph_time").toString());
                         seventhDayWeatherDTO.setTidetypeOne(((JSONObject) dataCol.get(i)).get("hl_code").toString());
+                        checkone = true;
                     } else if(i == 1) {
                         seventhDayWeatherDTO.setTidelevelTwo(((JSONObject) dataCol.get(i)).get("tph_level").toString());
                         seventhDayWeatherDTO.setTidetimeTwo(((JSONObject) dataCol.get(i)).get("tph_time").toString());
                         seventhDayWeatherDTO.setTidetypeTwo(((JSONObject) dataCol.get(i)).get("hl_code").toString());
+                        checktwo = true;
                     } else if(i == 2) {
                         seventhDayWeatherDTO.setTidelevelThree(((JSONObject) dataCol.get(i)).get("tph_level").toString());
                         seventhDayWeatherDTO.setTidetimeThree(((JSONObject) dataCol.get(i)).get("tph_time").toString());
                         seventhDayWeatherDTO.setTidetypeThree(((JSONObject) dataCol.get(i)).get("hl_code").toString());
+                        checkthree = true;
                     } else if(i == 3) {
                         seventhDayWeatherDTO.setTidelevelFour(((JSONObject) dataCol.get(i)).get("tph_level").toString());
                         seventhDayWeatherDTO.setTidetimeFour(((JSONObject) dataCol.get(i)).get("tph_time").toString());
                         seventhDayWeatherDTO.setTidetypeFour(((JSONObject) dataCol.get(i)).get("hl_code").toString());
+                        checkfour = true;
                     }
-
+                }
+                if(!checkone) {
+                    seventhDayWeatherDTO.setTidelevelOne(null);
+                    seventhDayWeatherDTO.setTidetimeOne(null);
+                    seventhDayWeatherDTO.setTidetypeOne(null);
+                }
+                if(!checktwo) {
+                    seventhDayWeatherDTO.setTidelevelTwo(null);
+                    seventhDayWeatherDTO.setTidetimeTwo(null);
+                    seventhDayWeatherDTO.setTidetypeTwo(null);
+                }
+                if(!checkthree) {
+                    seventhDayWeatherDTO.setTidelevelThree(null);
+                    seventhDayWeatherDTO.setTidetimeThree(null);
+                    seventhDayWeatherDTO.setTidetypeThree(null);
+                }
+                if(!checkfour) {
+                    seventhDayWeatherDTO.setTidelevelFour(null);
+                    seventhDayWeatherDTO.setTidetimeFour(null);
+                    seventhDayWeatherDTO.setTidetypeFour(null);
                 }
                 System.out.println(seventhDayWeatherDTO);
                 seventhDayWeatherService.setSeventhDayWeather(seventhDayWeatherDTO);
@@ -630,5 +844,22 @@ public class WeatherController {
 //        } catch (ParseException e) {
 //            throw new RuntimeException(e);
 //        }
+    }
+
+    @GetMapping("/getPreWeatherFirstDay")
+    public FirstDayWeatherDTO getFirstDayWeatherDTO(@RequestParam("obscode") String obscode) {
+        return firstDayWeatherService.getFirstDayWeather(obscode);
+    }
+
+    @GetMapping("/getPreWeatherOtherDay")
+    public List<OtherDayWeatherDTO> getOtherDayWeatherDTO(@RequestParam("obscode") String obscode) {
+        List<OtherDayWeatherDTO> otherDayWeatherDTOS = new ArrayList<>();
+        otherDayWeatherDTOS.add(secondDayWeatherService.getSecondDayWeather(obscode));
+        otherDayWeatherDTOS.add(thirdDayWeatherService.getThirdDayWeather(obscode));
+        otherDayWeatherDTOS.add(fourthDayWeatherService.getFourthDayWeather(obscode));
+        otherDayWeatherDTOS.add(fifthDayWeatherService.getFifthDayWeather(obscode));
+        otherDayWeatherDTOS.add(sixthDayWeatherService.getSixthDayWeather(obscode));
+        otherDayWeatherDTOS.add(seventhDayWeatherService.getSeventhDayWeather(obscode));
+        return otherDayWeatherDTOS;
     }
 }

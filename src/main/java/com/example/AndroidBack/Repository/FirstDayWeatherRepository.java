@@ -16,5 +16,7 @@ public interface FirstDayWeatherRepository extends JpaRepository<FirstDayWeather
     @Query(value = "truncate first_day_weather", nativeQuery = true)
     public void clearTable();
 
+    public FirstDayWeather findByObscode(String obscode);
+
 }
 

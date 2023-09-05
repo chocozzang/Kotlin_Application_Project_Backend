@@ -15,4 +15,6 @@ public interface FifthDayWeatherRepository extends JpaRepository<FifthDayWeather
     @Query(value = "truncate fifth_day_weather", nativeQuery = true)
     public void clearTable();
 
+    public FifthDayWeather findByObscode(String obscode);
+
 }

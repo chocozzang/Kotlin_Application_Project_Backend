@@ -15,4 +15,5 @@ public interface SeventhDayWeatherRepository extends JpaRepository<SeventhDayWea
     @Query(value = "truncate seventh_day_weather", nativeQuery = true)
     public void clearTable();
 
+    public SeventhDayWeather findByObscode(String obscode);
 }

@@ -4,6 +4,7 @@ import com.example.AndroidBack.Model.FirstDayWeather;
 import com.example.AndroidBack.Model.FirstDayWeatherDTO;
 import com.example.AndroidBack.Repository.FirstDayWeatherRepository;
 import lombok.AllArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 @AllArgsConstructor
@@ -39,8 +40,10 @@ public class FirstDayWeatherServiceImpl implements FirstDayWeatherService{
     }
 
     @Override
-    public FirstDayWeatherDTO getFirstDayWeather() {
-        return null;
+    public FirstDayWeatherDTO getFirstDayWeather(String obscode) {
+        ModelMapper modelMapper = new ModelMapper();
+        FirstDayWeather firstDayWeather = firstDayWeatherRepository.findByObscode(obscode);
+        return modelMapper.map(firstDayWeather, FirstDayWeatherDTO.class);
     }
 
     @Override

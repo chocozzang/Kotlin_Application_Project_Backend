@@ -6,7 +6,7 @@ public interface FirstDayWeatherService {
 
     public void setFirstDayWeather(FirstDayWeatherDTO firstDayWeatherDTO);
 
-    public FirstDayWeatherDTO getFirstDayWeather();
+    public FirstDayWeatherDTO getFirstDayWeather(String obscode);
 
     public void clearFirstDayWeather();
 }
