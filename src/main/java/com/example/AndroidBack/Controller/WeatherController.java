@@ -101,25 +101,48 @@ public class WeatherController {
     }
 
     @GetMapping("/totalWeathers")
-    public TotalWeatherDTO getTotalWeathers(@RequestParam("obscode") String obscode) {
-        TotalWeatherDTO totalWeatherDTO = new TotalWeatherDTO();
+    public List<TotalWeatherDTO> getTotalWeathers() {
+        List<String> obscodelist =  Arrays.asList(
+                "DT_0054",
+                "DT_0004",
+                "DT_0005",
+                "DT_0007",
+                "DT_0012",
+                "DT_0016",
+                "DT_0027",
+                "DT_0028",
+                "DT_0029",
+                "DT_0031",
+                "DT_0035",
+                "DT_0050",
+                "DT_0056"
+        );
 
-        List<TodayTideDTO> todayTideDTOS_2 = new ArrayList<>();
-        todayTideDTOS_2 = todayTideService.getTodayTide(obscode);
-        totalWeatherDTO.setTodayTideDTOList(todayTideDTOS_2);
+        List<TotalWeatherDTO> totalWeatherDTO = new ArrayList<TotalWeatherDTO>(obscodelist.size());
 
-        FirstDayWeatherDTO firstDayWeatherDTO_2 = new FirstDayWeatherDTO();
-        firstDayWeatherDTO_2 = firstDayWeatherService.getFirstDayWeather(obscode);
-        totalWeatherDTO.setFirstDayWeatherDTO(firstDayWeatherDTO_2);
+        for(int i = 0; i < obscodelist.size(); i++) {
+            String obscode = obscodelist.get(i);
+            TotalWeatherDTO temp = new TotalWeatherDTO();
+            List<TodayTideDTO> todayTideDTOS_2 = new ArrayList<TodayTideDTO>();
 
-        List<OtherDayWeatherDTO> otherDayWeatherDTOS_2 = new ArrayList<>();
-        otherDayWeatherDTOS_2.add(secondDayWeatherService.getSecondDayWeather(obscode));
-        otherDayWeatherDTOS_2.add(thirdDayWeatherService.getThirdDayWeather(obscode));
-        otherDayWeatherDTOS_2.add(fourthDayWeatherService.getFourthDayWeather(obscode));
-        otherDayWeatherDTOS_2.add(fifthDayWeatherService.getFifthDayWeather(obscode));
-        otherDayWeatherDTOS_2.add(sixthDayWeatherService.getSixthDayWeather(obscode));
-        otherDayWeatherDTOS_2.add(seventhDayWeatherService.getSeventhDayWeather(obscode));
-        totalWeatherDTO.setOtherDayWeatherDTOList(otherDayWeatherDTOS_2);
+            todayTideDTOS_2 = todayTideService.getTodayTide(obscode);
+            temp.setTodayTideDTOList(todayTideDTOS_2);
+
+            FirstDayWeatherDTO firstDayWeatherDTO_2 = new FirstDayWeatherDTO();
+            firstDayWeatherDTO_2 = firstDayWeatherService.getFirstDayWeather(obscode);
+            temp.setFirstDayWeatherDTO(firstDayWeatherDTO_2);
+
+            List<OtherDayWeatherDTO> otherDayWeatherDTOS_2 = new ArrayList<>();
+            otherDayWeatherDTOS_2.add(secondDayWeatherService.getSecondDayWeather(obscode));
+            otherDayWeatherDTOS_2.add(thirdDayWeatherService.getThirdDayWeather(obscode));
+            otherDayWeatherDTOS_2.add(fourthDayWeatherService.getFourthDayWeather(obscode));
+            otherDayWeatherDTOS_2.add(fifthDayWeatherService.getFifthDayWeather(obscode));
+            otherDayWeatherDTOS_2.add(sixthDayWeatherService.getSixthDayWeather(obscode));
+            otherDayWeatherDTOS_2.add(seventhDayWeatherService.getSeventhDayWeather(obscode));
+            temp.setOtherDayWeatherDTOList(otherDayWeatherDTOS_2);
+
+            totalWeatherDTO.add(temp);
+        }
 
         return totalWeatherDTO;
     }
